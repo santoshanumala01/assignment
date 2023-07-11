@@ -1,0 +1,15 @@
+---
+- name: Transfer files to another server
+  hosts: web
+  become: true
+
+  vars:
+    source_directory: /tmp/ssl
+    destination_directory: /tmp/
+
+  tasks:
+    - name: Copy files to destination server
+      copy:
+        src: "{{ source_directory }}"
+        dest: "{{ destination_directory }}"
+        

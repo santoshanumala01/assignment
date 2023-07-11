@@ -1,0 +1,28 @@
+---
+- name: Create symlink to Tomcat logs directory
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Print task information
+      debug:
+        msg: "Executing task: Create destination directory /ser/opt/tomcat"
+
+    - name: Create directory
+      file:
+        path: /ser/opt/tomcat
+        state: directory
+        mode: "0755"
+
+    - name: Print task information
+      debug:
+        msg: "Executing task: Create symlink"
+
+    - name: Create symlink
+      shell: ln -s /opt/tomcat8/logs/ /ser/opt/tomcat
+
+    - name: Print task information
+      debug:
+        msg: "Symlink created successfully"
+

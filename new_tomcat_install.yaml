@@ -1,0 +1,86 @@
+---
+- name: Http server running check and Tomcat installation
+  hosts: app
+  vars:
+    tomcat_url: https://dlcdn.apache.org/tomcat/tomcat-8/v8.5.90/bin/apache-tomcat-8.5.90.tar.gz
+  become: true
+
+  tasks:
+    - name: Check Apache HTTP
+      service:
+        name: apache2
+        state: started
+      register: apache_status
+      ignore_errors: true
+
+    - name: Fail message if Apache HTTP Server is not running
+      fail:
+        msg: "Apache HTTP Server is not running"
+      when: apache_status is failed
+
+    - name: Install JDK 8
+      apt:
+        name: openjdk-8-jre-headless
+        state: present
+      when: apache_status is success
+
+    - name: Create a Directory /opt/tomcat8
+      become: yes
+      file:
+        path: /opt/tomcat8
+        state: directory
+        mode: 0755
+      when: apache_status is success
+
+    - name: Download Tomcat using unarchive
+      become: yes
+      unarchive:
+        src: "{{tomcat_url}}"
+        dest: /opt/tomcat8
+        mode: 0755
+        remote_src: yes
+      when: apache_status is success
+
+    - name: Move files to the /opt/tomcat8 directory
+      become: yes
+      shell: "mv /opt/tomcat8/apache*/* /opt/tomcat8"
+      when: apache_status is success
+
+    - name: Creating a service file
+      become: yes
+      copy:
+        content: |
+          [Unit]
+          Description=Tomcat Service
+          Requires=network.target
+          After=network.target
+
+          [Service]
+          Type=forking
+          User=root
+          Environment="CATALINA_PID=/opt/tomcat8/logs/tomcat.pid"
+          Environment="CATALINA_BASE=/opt/tomcat8"
+          Environment="CATALINA_HOME=/opt/tomcat8"
+          Environment="CATALINA_OPTS=-Xms512M -Xmx1024M -server -XX:+UseParallelGC"
+          ExecStart=/opt/tomcat8/bin/startup.sh
+          ExecStop=/opt/tomcat8/bin/shutdown.sh
+          Restart=on-abnormal
+
+          [Install]
+          WantedBy=multi-user.target
+        dest: /etc/systemd/system/tomcat.service
+      when: apache_status is success
+
+    - name: Reload the SystemD to re-read configurations
+      become: yes
+      systemd:
+        daemon-reload: yes
+      when: apache_status is success
+
+    - name: Enable the Tomcat service and start
+      become: yes
+      systemd:
+        name: tomcat
+        enabled: yes
+        state: started 
+      when: apache_status is success

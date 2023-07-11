@@ -1,0 +1,42 @@
+---
+- name: Transfer the keystore and update the Tomcat conf to enable SSL
+  hosts: app
+  become: true
+
+  vars:
+    source_directory: /etc/ansible/playbooks/cert/
+    destination_directory: /opt/tomcat8/conf/
+    tomcat_keystore_password: welcome123
+    tomcat_certificate_alias: mycert
+    tomcat_keystore_path: /opt/tomcat8/conf/keystore.jks
+
+  tasks:
+    - name: Copy files to destination server
+      copy:
+        src: "{{ source_directory }}"
+        dest: "{{ destination_directory }}"
+
+    - name: Install Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files
+      become: true
+      apt:
+        name: openjdk-8-jre-headless
+        state: latest
+  
+    - name: Configure Tomcat server.xml for SSL
+      become: true
+      lineinfile:
+        dest: /opt/tomcat8/conf/server.xml
+        regexp: '<!--\s*HTTP\s*connector\s*section\s*-->'
+        line: |
+          <Connector port="8443" protocol="HTTP/1.1"
+                     maxThreads="150" SSLEnabled="true" scheme="https" secure="true"
+                     keystoreFile="{{ tomcat_keystore_path }}"
+                     keystorePass="{{ tomcat_keystore_password }}"
+                     clientAuth="false" sslProtocol="TLS"
+                     keyAlias="{{ tomcat_certificate_alias }}" />
+
+    - name: Restart Tomcat service
+      become: true
+      service:
+        name: tomcat
+        state: restarted

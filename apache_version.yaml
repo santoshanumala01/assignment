@@ -1,0 +1,19 @@
+
+
+---
+- name: Check Apache HTTP Server version
+  hosts: web
+  gather_facts: no
+
+  tasks:
+    - name: Print task information
+      debug:
+        msg: "Executing task: Retrieving Apache HTTP Server version"
+
+    - name: Retrieve Apache HTTP Server version
+      shell: 'apache2 -v | awk -F"/" "/version/{print $2}"'
+      register: apache_version
+
+    - name: Display Apache HTTP Server version
+      debug:
+        msg: "Apache HTTP Server version is {{ apache_version.stdout }}"

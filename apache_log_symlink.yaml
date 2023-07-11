@@ -1,0 +1,26 @@
+---
+- name: Create symlink to Apache logs directory
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Print task information
+      debug:
+        msg: "Executing task: Create destination directory /user/opt/apache"
+
+    - name: Create directory
+      file:
+        path: /user/opt/apache
+        state: directory
+
+    - name: Print task information
+      debug:
+        msg: "Executing task: Create symlink"
+
+    - name: Create symlink
+      shell: ln -s /var/log/apache2/  /user/opt/apache
+
+    - name: Print task information
+      debug:
+        msg: "Symlink created successfully"

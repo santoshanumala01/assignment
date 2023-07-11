@@ -1,0 +1,13 @@
+---
+- name: Check Tomcat version
+  hosts: all
+  gather_facts: no
+
+  tasks:
+    - name: Retrieve Tomcat version
+      shell: '/opt/tomcat8/bin/catalina.sh version | awk -F" " "NR==7{print $3}"'
+      register: tomcat_version
+
+    - name: Display Tomcat version
+      debug:
+        msg: "Tomcat version is {{ tomcat_version.stdout }}"

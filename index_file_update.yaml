@@ -1,0 +1,36 @@
+---
+- name: Create and modify index files
+  hosts: web
+  gather_facts: false
+  become: true
+
+  tasks:
+    - name: Delete index.html if it exists
+      file:
+        path: "/var/www/html/index.html"
+        state: absent
+
+    - name: Create files
+      file:
+        path: "/var/www/html/{{ item }}"
+        state: touch
+        mode: "0644"
+      loop:
+        - "index.html"
+        - "index1.html"
+        - "index2.html"
+
+    - name: Append text to index.html
+      lineinfile:
+        path: "/var/www/html/index.html"
+        line: "welcome to Anisble Demo"
+
+    - name: Append text to index1.html
+      lineinfile:
+        path: "/var/www/html/index1.html"
+        line: "welcome to solugenix"
+
+    - name: Append text to index2.html
+      lineinfile:
+        path: "/var/www/html/index2.html"
+        line: "Ansible Automation"

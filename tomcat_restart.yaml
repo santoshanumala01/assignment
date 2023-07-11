@@ -1,0 +1,10 @@
+---
+- name: Http server running check and Tomcat installation
+  hosts: web
+  become: true 
+
+  tasks:
+    - name: Restart Tomcat service
+      service:
+        name: tomcat
+        state: restarted

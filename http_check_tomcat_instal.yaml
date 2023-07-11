@@ -1,0 +1,30 @@
+---
+- name: Http server running check and tomcat installation
+  hosts: web
+  become: true
+
+  tasks:
+    - name: Check Apache HTTP 
+      service:
+        name: apache2
+        state: started
+      register: apache_status
+      ignore_errors: true
+
+    - name: Fail message if Apache HTTP Server is not running
+      fail:
+        msg: "Apache HTTP Server is not running"
+      when: apache_status is failed
+
+    - name: Install Tomcat
+      apt:
+        name: tomcat9
+        state: present
+      when: apache_status is success
+
+    - name: Start Tomcat service
+      service:
+        name: tomcat9
+        state: started
+        enabled: true
+      when: apache_status is success
