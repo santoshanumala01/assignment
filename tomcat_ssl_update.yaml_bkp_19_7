@@ -4,7 +4,7 @@
   become: true
 
   vars:
-    source_directory: /tmp/cert/
+    source_directory: /etc/ansible/playbooks/cert/
     destination_directory: /opt/tomcat8/conf/
     tomcat_keystore_password: welcome123
     tomcat_certificate_alias: mycert
