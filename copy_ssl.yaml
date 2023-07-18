@@ -1,6 +1,6 @@
 ---
 - name: Transfer files to another server
-  hosts: web
+  hosts: all
   become: true
 
   vars:

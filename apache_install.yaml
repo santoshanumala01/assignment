@@ -1,6 +1,6 @@
 ---
 - name: Apache Installation  
-  hosts: app
+  hosts: all
   become: true
   
   tasks:

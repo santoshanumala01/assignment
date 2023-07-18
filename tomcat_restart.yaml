@@ -1,6 +1,6 @@
 ---
 - name: Http server running check and Tomcat installation
-  hosts: web
+  hosts: all
   become: true 
 
   tasks:

@@ -1,6 +1,6 @@
 ---
 - name: Transfer the keystore and update the Tomcat conf to enable SSL
-  hosts: web
+  hosts: all
   become: true
 
   vars:
