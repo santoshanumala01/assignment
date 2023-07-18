@@ -18,6 +18,9 @@
         msg: "Apache HTTP Server is not running"
       when: apache_status is failed
 
+    - name: Update apt cache
+      shell: sudo apt-get update
+
     - name: Install JDK 8
       apt:
         name: openjdk-8-jre-headless
