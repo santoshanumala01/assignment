@@ -1,0 +1,28 @@
+---
+- name: Transfer the keystore and update the Tomcat conf to enable SSL
+  hosts: all
+  become: true
+
+  vars:
+    source_directory: /tmp/cert/keystore.jks
+    destination_directory: /opt/tomcat8/conf/keystore.jks
+    tomcat_keystore_password: welcome123
+    tomcat_certificate_alias: mycert
+    tomcat_keystore_path: /opt/tomcat8/conf/keystore.jks
+
+  tasks:
+ 
+    - name: Copy webserver key file into memory
+      ansible.builtin.slurp:
+        src: "{{ source_directory }}"
+      register: slurped_key_file
+      delegate_to: localhost
+
+    - name: Write copy of key file from memory
+      ansible.builtin.copy:
+        backup: true
+        dest: "{{ destination_directory }}"
+        group: root
+        mode: 0777
+        owner: root
+        content: "{{ slurped_key_file['content'] | b64decode }}"
