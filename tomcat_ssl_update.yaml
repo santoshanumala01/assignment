@@ -15,6 +15,7 @@
       copy:
         src: "{{ source_directory }}"
         dest: "{{ destination_directory }}"
+        remote_src: yes
 
     - name: Install Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files
       become: true
